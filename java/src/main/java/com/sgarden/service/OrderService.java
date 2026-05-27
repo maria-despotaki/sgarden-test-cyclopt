@@ -4,6 +4,7 @@ import com.sgarden.dto.OrderItemRequest;
 import com.sgarden.dto.OrderRequest;
 import com.sgarden.model.Order;
 import com.sgarden.model.OrderItem;
+import com.sgarden.model.OrderStatus;
 import com.sgarden.model.Product;
 import com.sgarden.repository.OrderRepository;
 import com.sgarden.repository.ProductRepository;
@@ -11,11 +12,25 @@ import static com.sgarden.util.ErrorMessages.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrderService {
+
+    private static final Map<OrderStatus, Set<OrderStatus>> VALID_TRANSITIONS = new EnumMap<>(OrderStatus.class);
+
+    static {
+        VALID_TRANSITIONS.put(OrderStatus.PENDING, EnumSet.of(OrderStatus.CONFIRMED, OrderStatus.CANCELLED));
+        VALID_TRANSITIONS.put(OrderStatus.CONFIRMED, EnumSet.of(OrderStatus.SHIPPED));
+        VALID_TRANSITIONS.put(OrderStatus.SHIPPED, EnumSet.of(OrderStatus.DELIVERED));
+        VALID_TRANSITIONS.put(OrderStatus.DELIVERED, EnumSet.noneOf(OrderStatus.class));
+        VALID_TRANSITIONS.put(OrderStatus.CANCELLED, EnumSet.noneOf(OrderStatus.class));
+    }
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -25,9 +40,24 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    public List<Order> getAllOrders() {
+    public List<Order> getAllOrders(OrderStatus status) {
+        if (status != null) {
+            return orderRepository.findByStatus(status);
+        }
         System.out.println("Fetching all orders");
         return orderRepository.findAll();
+    }
+
+    public Optional<Order> transitionOrderStatus(String id, OrderStatus newStatus) {
+        return orderRepository.findById(id).map(order -> {
+            OrderStatus current = order.getStatus();
+            Set<OrderStatus> allowed = VALID_TRANSITIONS.getOrDefault(current, EnumSet.noneOf(OrderStatus.class));
+            if (!allowed.contains(newStatus)) {
+                throw new RuntimeException(INVALID_STATUS_TRANSITION + ": " + current + " -> " + newStatus);
+            }
+            order.setStatus(newStatus);
+            return orderRepository.save(order);
+        });
     }
 
     public Optional<Order> getOrderById(String id) {

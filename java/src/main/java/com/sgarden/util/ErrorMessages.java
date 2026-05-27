@@ -16,4 +16,6 @@ public final class ErrorMessages {
     public static final String HASHING_FAILED = "Hashing failed";
 
     public static final String THRESHOLD_INVALID = "threshold must be a non-negative number";
+
+    public static final String INVALID_STATUS_TRANSITION = "Invalid status transition";
 }
