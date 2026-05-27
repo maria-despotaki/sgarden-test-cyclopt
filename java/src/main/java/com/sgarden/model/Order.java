@@ -24,6 +24,8 @@ public class Order {
 
     private Double total;
 
+    private OrderStatus status = OrderStatus.PENDING;
+
     @CreatedDate
     private Instant createdAt;
 

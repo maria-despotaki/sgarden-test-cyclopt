@@ -2,10 +2,13 @@ package com.sgarden.controller;
 
 import com.sgarden.dto.ErrorResponse;
 import com.sgarden.dto.OrderRequest;
+import com.sgarden.dto.OrderStatusRequest;
 import com.sgarden.model.Order;
+import com.sgarden.model.OrderStatus;
 import com.sgarden.service.OrderService;
 import static com.sgarden.util.ErrorMessages.*;
 import com.sgarden.validation.OnCreate;
+import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +29,24 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public ResponseEntity<List<Order>> getAllOrders(
+            @RequestParam(required = false) OrderStatus status) {
+        return ResponseEntity.ok(orderService.getAllOrders(status));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(
+            @PathVariable String id,
+            @RequestBody @Valid OrderStatusRequest request) {
+        try {
+            return orderService.transitionOrderStatus(id, request.getStatus())
+                    .map(order -> ResponseEntity.ok((Object) order))
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new ErrorResponse(ORDER_NOT_FOUND)));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
