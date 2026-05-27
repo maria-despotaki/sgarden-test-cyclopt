@@ -18,6 +18,8 @@ import java.util.Map;
 @RequestMapping("/api/orders")
 public class OrderController {
 
+    private static final String ORDER_NOT_FOUND = "Order not found";
+
     private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
@@ -34,7 +36,7 @@ public class OrderController {
         return orderService.getOrderById(id)
                 .map(order -> ResponseEntity.ok((Object) order))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ErrorResponse("Order not found")));
+                        .body(new ErrorResponse(ORDER_NOT_FOUND)));
     }
 
     @PostMapping
@@ -57,7 +59,7 @@ public class OrderController {
             return orderService.updateOrder(id, request)
                     .map(order -> ResponseEntity.ok((Object) order))
                     .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new ErrorResponse("Order not found")));
+                            .body(new ErrorResponse(ORDER_NOT_FOUND)));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
@@ -70,6 +72,6 @@ public class OrderController {
             return ResponseEntity.ok(Map.of("message", "Order deleted"));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse("Order not found"));
+                .body(new ErrorResponse(ORDER_NOT_FOUND));
     }
 }

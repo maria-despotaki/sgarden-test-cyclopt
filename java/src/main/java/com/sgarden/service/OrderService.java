@@ -16,6 +16,8 @@ import java.util.Optional;
 @Service
 public class OrderService {
 
+    private static final String PRODUCT_NOT_FOUND = "Product not found: ";
+
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
@@ -41,7 +43,7 @@ public class OrderService {
         for (OrderItemRequest itemRequest : request.getItems()) {
             Optional<Product> productOpt = productRepository.findById(itemRequest.getProductId());
             if (productOpt.isEmpty()) {
-                throw new RuntimeException("Product not found: " + itemRequest.getProductId());
+                throw new RuntimeException(PRODUCT_NOT_FOUND + itemRequest.getProductId());
             }
             Product product = productOpt.get();
             items.add(new OrderItem(product.getId(), itemRequest.getQuantity()));
@@ -63,7 +65,7 @@ public class OrderService {
             for (OrderItemRequest itemRequest : request.getItems()) {
                 Optional<Product> productOpt = productRepository.findById(itemRequest.getProductId());
                 if (productOpt.isEmpty()) {
-                    throw new RuntimeException("Product not found: " + itemRequest.getProductId());
+                    throw new RuntimeException(PRODUCT_NOT_FOUND + itemRequest.getProductId());
                 }
                 Product product = productOpt.get();
                 items.add(new OrderItem(product.getId(), itemRequest.getQuantity()));
