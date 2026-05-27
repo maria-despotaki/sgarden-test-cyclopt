@@ -6,8 +6,11 @@ import com.sgarden.dto.ProductStatsResponse;
 import com.sgarden.model.Product;
 import com.sgarden.repository.ProductRepository;
 import com.sgarden.service.ProductService;
+import com.sgarden.validation.OnCreate;
+import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -57,13 +60,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
+    public ResponseEntity<?> createProduct(@RequestBody @Validated({OnCreate.class, Default.class}) ProductRequest request) {
         Product product = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody ProductRequest request) {
+    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody @Validated ProductRequest request) {
         return productService.updateProduct(id, request)
                 .map(product -> ResponseEntity.ok((Object) product))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
