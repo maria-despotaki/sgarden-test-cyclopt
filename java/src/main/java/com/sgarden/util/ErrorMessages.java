@@ -14,4 +14,6 @@ public final class ErrorMessages {
     public static final String VALIDATION_FAILED = "Validation failed";
     public static final String REPORT_NOT_FOUND = "Report not found";
     public static final String HASHING_FAILED = "Hashing failed";
+
+    public static final String THRESHOLD_INVALID = "threshold must be a non-negative number";
 }
