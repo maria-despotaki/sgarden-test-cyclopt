@@ -10,6 +10,11 @@ public class WebConfig {
 
     @Bean
     public Converter<String, OrderStatus> stringToOrderStatusConverter() {
-        return source -> OrderStatus.valueOf(source.trim().toUpperCase());
+        return new Converter<String, OrderStatus>() {
+            @Override
+            public OrderStatus convert(String source) {
+                return OrderStatus.valueOf(source.trim().toUpperCase());
+            }
+        };
     }
 }
