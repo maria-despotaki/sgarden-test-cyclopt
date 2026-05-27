@@ -1,6 +1,7 @@
 package com.sgarden.controller;
 
 import com.sgarden.dto.ErrorResponse;
+import com.sgarden.dto.ProductPageResponse;
 import com.sgarden.dto.ProductRequest;
 import com.sgarden.dto.ProductStatsResponse;
 import com.sgarden.model.Product;
@@ -28,8 +29,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<ProductPageResponse> getAllProducts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int limit,
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "asc") String order) {
+        return ResponseEntity.ok(productService.getAllProducts(page, limit, sort, order));
     }
 
     // exposes GET /api/products/stats as a public endpoint
