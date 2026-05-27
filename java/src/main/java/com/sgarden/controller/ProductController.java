@@ -37,6 +37,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductStats());
     }
 
+    // GET /api/products/search accepts all 4 optional params here
     @GetMapping("/search")
     public ResponseEntity<List<Product>> searchProducts(
             @RequestParam(required = false) String q,
