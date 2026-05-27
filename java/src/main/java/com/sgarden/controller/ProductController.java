@@ -32,6 +32,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
+    // exposes GET /api/products/stats as a public endpoint
     @GetMapping("/stats")
     public ResponseEntity<ProductStatsResponse> getProductStats() {
         return ResponseEntity.ok(productService.getProductStats());

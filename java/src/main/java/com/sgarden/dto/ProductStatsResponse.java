@@ -8,6 +8,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class ProductStatsResponse {
+    // All fields needed are here
     private long totalCount;
     private Double averagePrice;
     private Double minPrice;
