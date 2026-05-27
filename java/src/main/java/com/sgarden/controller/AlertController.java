@@ -4,6 +4,7 @@ import com.sgarden.dto.AlertResponse;
 import com.sgarden.dto.ErrorResponse;
 import com.sgarden.dto.ThresholdRequest;
 import com.sgarden.service.AlertService;
+import static com.sgarden.util.ErrorMessages.THRESHOLD_INVALID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class AlertController {
     public ResponseEntity<?> setThreshold(@RequestBody ThresholdRequest request) {
         if (request.getThreshold() == null || request.getThreshold() < 0) {
             return ResponseEntity.badRequest()
-                    .body(new ErrorResponse("threshold must be a non-negative number"));
+                    .body(new ErrorResponse(THRESHOLD_INVALID));
         }
         int newThreshold = alertService.setThreshold(request.getThreshold());
         return ResponseEntity.ok(Map.of("threshold", newThreshold));
