@@ -3,6 +3,7 @@ package com.sgarden.controller;
 import com.sgarden.dto.ErrorResponse;
 import com.sgarden.model.User;
 import com.sgarden.repository.UserRepository;
+import static com.sgarden.util.ErrorMessages.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class UserController {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
+                    .body(new ErrorResponse(USER_NOT_FOUND));
         }
 
         User user = userOpt.get();
@@ -66,7 +67,7 @@ public class UserController {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
+                    .body(new ErrorResponse(USER_NOT_FOUND));
         }
 
         User user = userOpt.get();
@@ -142,7 +143,7 @@ public class UserController {
                     .body(content);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Report not found"));
+                    .body(new ErrorResponse(REPORT_NOT_FOUND));
         }
     }
 
@@ -165,7 +166,7 @@ public class UserController {
             return ResponseEntity.ok(Map.of("hash", hexString.toString(), "algorithm", "MD5"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponse("Hashing failed"));
+                    .body(new ErrorResponse(HASHING_FAILED));
         }
     }
 
@@ -264,7 +265,7 @@ public class UserController {
         // SECURITY ISSUE: any authenticated user can delete any user
         if (!userRepository.existsById(userId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
+                    .body(new ErrorResponse(USER_NOT_FOUND));
         }
         userRepository.deleteById(userId);
         System.out.println("User deleted: " + userId);
@@ -281,7 +282,7 @@ public class UserController {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
+                    .body(new ErrorResponse(USER_NOT_FOUND));
         }
 
         User user = userOpt.get();
@@ -296,7 +297,7 @@ public class UserController {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
+                    .body(new ErrorResponse(USER_NOT_FOUND));
         }
         User user = userOpt.get();
         Map<String, Object> response = new HashMap<>();
@@ -316,7 +317,7 @@ public class UserController {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("User not found"));
+                    .body(new ErrorResponse(USER_NOT_FOUND));
         }
         User user = userOpt.get();
         Map<String, Object> response = new HashMap<>();

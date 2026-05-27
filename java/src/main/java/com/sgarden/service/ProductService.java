@@ -5,6 +5,7 @@ import com.sgarden.dto.ProductRequest;
 import com.sgarden.dto.ProductStatsResponse;
 import com.sgarden.model.Product;
 import com.sgarden.repository.ProductRepository;
+import static com.sgarden.util.ErrorMessages.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -137,6 +138,16 @@ public class ProductService {
             query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
         }
         return mongoTemplate.find(query, Product.class);
+    }
+
+    public Optional<Product> updateStock(String id, Integer stock) {
+        if (stock < 0) {
+            throw new IllegalArgumentException(STOCK_CANNOT_BE_NEGATIVE);
+        }
+        return productRepository.findById(id).map(product -> {
+            product.setStock(stock);
+            return productRepository.save(product);
+        });
     }
 
     public boolean deleteProduct(String id) {

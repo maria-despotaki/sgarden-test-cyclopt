@@ -7,6 +7,7 @@ import com.sgarden.dto.ProductStatsResponse;
 import com.sgarden.model.Product;
 import com.sgarden.repository.ProductRepository;
 import com.sgarden.service.ProductService;
+import static com.sgarden.util.ErrorMessages.*;
 import com.sgarden.validation.OnCreate;
 import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
@@ -61,7 +62,7 @@ public class ProductController {
         return productService.getProductById(id)
                 .map(product -> ResponseEntity.ok((Object) product))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ErrorResponse("Product not found")));
+                        .body(new ErrorResponse(PRODUCT_NOT_FOUND)));
     }
 
     @PostMapping
@@ -75,7 +76,7 @@ public class ProductController {
         return productService.updateProduct(id, request)
                 .map(product -> ResponseEntity.ok((Object) product))
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ErrorResponse("Product not found")));
+                        .body(new ErrorResponse(PRODUCT_NOT_FOUND)));
     }
 
     @DeleteMapping("/{id}")
@@ -84,7 +85,7 @@ public class ProductController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse("Product not found"));
+                .body(new ErrorResponse(PRODUCT_NOT_FOUND));
     }
 
     @GetMapping("/summary/{productId}")
@@ -92,7 +93,7 @@ public class ProductController {
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Product not found"));
+                    .body(new ErrorResponse(PRODUCT_NOT_FOUND));
         }
         Product product = productOpt.get();
         Map<String, Object> response = new HashMap<>();
@@ -112,7 +113,7 @@ public class ProductController {
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Product not found"));
+                    .body(new ErrorResponse(PRODUCT_NOT_FOUND));
         }
         Product product = productOpt.get();
         Map<String, Object> response = new HashMap<>();
@@ -127,13 +128,31 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<?> updateProductStock(@PathVariable String id,
+                                                @RequestBody Map<String, Integer> body) {
+        Integer stock = body.get("stock");
+        if (stock == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(STOCK_REQUIRED));
+        }
+        if (stock < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(STOCK_CANNOT_BE_NEGATIVE));
+        }
+        return productService.updateStock(id, stock)
+                .map(product -> ResponseEntity.ok((Object) product))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorResponse(PRODUCT_NOT_FOUND)));
+    }
+
     @PostMapping("/{productId}/discount")
     public ResponseEntity<?> applyDiscount(@PathVariable String productId,
                                            @RequestBody Map<String, Double> body) {
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Product not found"));
+                    .body(new ErrorResponse(PRODUCT_NOT_FOUND));
         }
         Double discountPercent = body.get("discountPercent");
         if (discountPercent == null || discountPercent < 0 || discountPercent > 100) {
@@ -153,7 +172,7 @@ public class ProductController {
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse("Product not found"));
+                    .body(new ErrorResponse(PRODUCT_NOT_FOUND));
         }
         Integer quantity = body.get("quantity");
         if (quantity == null || quantity <= 0) {

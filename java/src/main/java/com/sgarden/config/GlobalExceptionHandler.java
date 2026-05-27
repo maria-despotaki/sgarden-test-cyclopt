@@ -1,6 +1,7 @@
 package com.sgarden.config;
 
 import com.sgarden.dto.ErrorResponse;
+import static com.sgarden.util.ErrorMessages.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Validation failed", errors));
+                .body(new ErrorResponse(VALIDATION_FAILED, errors));
     }
 
     @ExceptionHandler(RuntimeException.class)
