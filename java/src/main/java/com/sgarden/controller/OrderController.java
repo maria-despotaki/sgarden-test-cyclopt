@@ -4,6 +4,7 @@ import com.sgarden.dto.ErrorResponse;
 import com.sgarden.dto.OrderRequest;
 import com.sgarden.model.Order;
 import com.sgarden.service.OrderService;
+import static com.sgarden.util.ErrorMessages.*;
 import com.sgarden.validation.OnCreate;
 import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
-
-    private static final String ORDER_NOT_FOUND = "Order not found";
 
     private final OrderService orderService;
 

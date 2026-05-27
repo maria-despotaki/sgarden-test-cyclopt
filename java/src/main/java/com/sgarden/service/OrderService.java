@@ -7,6 +7,7 @@ import com.sgarden.model.OrderItem;
 import com.sgarden.model.Product;
 import com.sgarden.repository.OrderRepository;
 import com.sgarden.repository.ProductRepository;
+import static com.sgarden.util.ErrorMessages.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,8 +16,6 @@ import java.util.Optional;
 
 @Service
 public class OrderService {
-
-    private static final String PRODUCT_NOT_FOUND = "Product not found: ";
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -38,16 +37,28 @@ public class OrderService {
 
     public Order createOrder(OrderRequest request) {
         List<OrderItem> items = new ArrayList<>();
+        List<Product> resolvedProducts = new ArrayList<>();
         double total = 0.0;
 
         for (OrderItemRequest itemRequest : request.getItems()) {
             Optional<Product> productOpt = productRepository.findById(itemRequest.getProductId());
             if (productOpt.isEmpty()) {
-                throw new RuntimeException(PRODUCT_NOT_FOUND + itemRequest.getProductId());
+                throw new RuntimeException(PRODUCT_NOT_FOUND + ": " + itemRequest.getProductId());
             }
             Product product = productOpt.get();
+            int available = product.getStock() != null ? product.getStock() : 0;
+            if (available < itemRequest.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for product: " + itemRequest.getProductId());
+            }
             items.add(new OrderItem(product.getId(), itemRequest.getQuantity()));
             total += product.getPrice() * itemRequest.getQuantity();
+            resolvedProducts.add(product);
+        }
+
+        for (int i = 0; i < resolvedProducts.size(); i++) {
+            Product product = resolvedProducts.get(i);
+            product.setStock(product.getStock() - request.getItems().get(i).getQuantity());
+            productRepository.save(product);
         }
 
         Order order = new Order();
@@ -65,7 +76,7 @@ public class OrderService {
             for (OrderItemRequest itemRequest : request.getItems()) {
                 Optional<Product> productOpt = productRepository.findById(itemRequest.getProductId());
                 if (productOpt.isEmpty()) {
-                    throw new RuntimeException(PRODUCT_NOT_FOUND + itemRequest.getProductId());
+                    throw new RuntimeException(PRODUCT_NOT_FOUND + ": " + itemRequest.getProductId());
                 }
                 Product product = productOpt.get();
                 items.add(new OrderItem(product.getId(), itemRequest.getQuantity()));
