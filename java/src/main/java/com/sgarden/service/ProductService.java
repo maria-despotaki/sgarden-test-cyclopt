@@ -78,6 +78,7 @@ public class ProductService {
         });
     }
 
+    // computes all metrics in-memory via Java streams
     public ProductStatsResponse getProductStats() {
         List<Product> all = productRepository.findAll();
         long totalCount = all.size();
