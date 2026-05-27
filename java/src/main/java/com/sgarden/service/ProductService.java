@@ -98,6 +98,7 @@ public class ProductService {
         return new ProductStatsResponse(totalCount, averagePrice, minPrice, maxPrice, categoryCount);
     }
 
+    // Builds a dynamic MongoDB query using Criteria + andOperator, covering all combinations:
     public List<Product> searchProducts(String q, String category, Double minPrice, Double maxPrice) {
         List<Criteria> criteria = new ArrayList<>();
 
