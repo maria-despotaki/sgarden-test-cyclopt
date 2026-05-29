@@ -95,7 +95,7 @@ public class ProductService {
     // computes all metrics in-memory via Java streams
     public ProductStatsResponse getProductStats() {
         List<Product> all = productRepository.findAll();
-        long totalCount = all.size();
+        long totalCount = all.stream().filter(p -> p.getCategory() != null).count();
 
         DoubleSummaryStatistics priceStats = all.stream()
                 .filter(p -> p.getPrice() != null)
