@@ -18,4 +18,7 @@ public final class ErrorMessages {
     public static final String THRESHOLD_INVALID = "threshold must be a non-negative number";
 
     public static final String INVALID_STATUS_TRANSITION = "Invalid status transition";
+
+    public static final String PRICE_REQUIRED = "Price is required";
+    public static final String INVALID_SORT_FIELD = "Invalid sort field. Allowed: name, price, stock, category, createdAt, updatedAt";
 }
