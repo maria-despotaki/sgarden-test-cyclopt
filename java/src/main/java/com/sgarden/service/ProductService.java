@@ -17,6 +17,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,9 @@ public class ProductService {
     // CODE QUALITY ISSUE: unused variable
     private final String serviceName = "ProductService";
 
+    private static final Set<String> VALID_SORT_FIELDS =
+            Set.of("name", "price", "stock", "category", "createdAt", "updatedAt");
+
     public ProductService(ProductRepository productRepository, MongoTemplate mongoTemplate) {
         this.productRepository = productRepository;
         this.mongoTemplate = mongoTemplate;
@@ -36,6 +40,10 @@ public class ProductService {
     public ProductPageResponse getAllProducts(int page, int limit, String sort, String order) {
         System.out.println("Fetching products: page=" + page + ", limit=" + limit + ", sort=" + sort + ", order=" + order);
         long total = mongoTemplate.count(new Query(), Product.class);
+
+        if (sort != null && !sort.isBlank() && !VALID_SORT_FIELDS.contains(sort)) {
+            throw new IllegalArgumentException(INVALID_SORT_FIELD);
+        }
 
         Query query = new Query();
         if (sort != null && !sort.isBlank()) {
